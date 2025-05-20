@@ -1,9 +1,14 @@
+import RememberMe from '../utils/rememberMe.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const togglePassword = document.querySelector('.toggle-password');
     const passwordInput = document.getElementById('password');
     const emailInput = document.getElementById('email');
     const rememberCheckbox = document.getElementById('remember');
+
+    // Auto-fill form if credentials exist
+    RememberMe.autoFillForm(emailInput, passwordInput, rememberCheckbox);
 
     // Toggle password visibility
     togglePassword.addEventListener('click', () => {
@@ -20,6 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = emailInput.value;
         const password = passwordInput.value;
         const remember = rememberCheckbox.checked;
+
+        // Handle remember me
+        if (remember) {
+            RememberMe.saveCredentials(email, password);
+        } else {
+            RememberMe.clearCredentials();
+        }
 
         // Add loading state to button
         const loginBtn = document.querySelector('.login-btn');

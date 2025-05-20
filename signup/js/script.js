@@ -5,8 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const fullnameInput = document.getElementById('fullname');
+    const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const termsCheckbox = document.getElementById('terms');
+
+    // Username validation
+    function validateUsername(username) {
+        // Username should be 3-20 characters long and can contain letters, numbers, and underscores
+        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+        return usernameRegex.test(username);
+    }
 
     // Toggle password visibility
     togglePassword.addEventListener('click', () => {
@@ -40,10 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const fullname = fullnameInput.value;
+        const username = usernameInput.value;
         const email = emailInput.value;
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
         const terms = termsCheckbox.checked;
+
+        // Validate username
+        if (!validateUsername(username)) {
+            alert('Username must be 3-20 characters long and can only contain letters, numbers, and underscores.');
+            return;
+        }
 
         // Validate password
         if (!validatePassword(password)) {
@@ -72,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simulate API call
         setTimeout(() => {
             // Here you would typically make an API call to your backend
-            console.log('Signup attempt:', { fullname, email, password, terms });
+            console.log('Signup attempt:', { fullname, username, email, password, terms });
             
             // Reset button state
             signupBtn.textContent = originalText;
