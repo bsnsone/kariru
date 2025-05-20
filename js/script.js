@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.social-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const provider = btn.classList.contains('google') ? 'Google' : 'Facebook';
-            alert(`${provider} login clicked!`);
+            alert(`${provider} login feature will be added soon! Stay tuned for updates.`);
         });
     });
 
