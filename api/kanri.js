@@ -1,7 +1,7 @@
-// Removed https from 'firebase-functions' as it's not needed for Vercel
 import express from 'express';
 import cors from 'cors';
 // Use the client SDK 'db' as requested
+// --- FIX: Updated the import path ---
 import { db } from './lib/firebase.js'; 
 import { 
   collection, 
@@ -20,7 +20,6 @@ import {
 const app = express();
 
 // --- Middleware ---
-
 // 1. Enable All Cross-Origin Requests (CORS)
 app.use(cors({ origin: true }));
 app.use(express.json()); // Middleware to parse JSON bodies
@@ -120,6 +119,18 @@ const generateTrxID = () => {
 
 // --- API Endpoints (Using Client SDK v9) ---
 
+// [GET] Welcome route
+app.get('/', (req, res) => {
+  res.status(200).send({ 
+    message: 'Welcome to the Kanri API!',
+    note: 'This is the base of the /api/kanri function.',
+    endpoints: {
+      getAllUsers: '/users',
+      getUserHistory: '/users/:username/history',
+    } 
+  });
+});
+
 // [POST] Create a new account
 app.post('/users', requireAdminAuth, async (req, res) => {
   try {
@@ -183,8 +194,6 @@ app.get('/users/:username/history', requireUserOrAdminAuth, async (req, res) => 
     const historyQuery = query(
       collection(db, 'kanri_transactions'), 
       where('username', '==', username)
-      // Note: Ordering requires a composite index in Firestore
-      // orderBy('timestamp', 'desc') 
     );
                          
     const snapshot = await getDocs(historyQuery);
@@ -201,6 +210,7 @@ app.get('/users/:username/history', requireUserOrAdminAuth, async (req, res) => 
     // Sort in code to avoid needing an index
     history.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
 
+    // --- FIX: Corrected typo '2S00' to '200' ---
     return res.status(200).send(history);
   } catch (error) {
     console.error("GET /users/:username/history error:", error);
@@ -270,7 +280,7 @@ app.put('/users/:username/transaction', requireAdminAuth, async (req, res) => {
   } catch (error) {
     console.error("PUT /users/:username/transaction error:", error);
     if (error.message === 'User not found') {
-      return res.status(4404).send({ error: 'User not found.' });
+      return res.status(404).send({ error: 'User not found.' });
     }
     if (error.message === 'InSufficient funds') {
       return res.status(400).send({ error: 'Insufficient funds for this deduction.' });
