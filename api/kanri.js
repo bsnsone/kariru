@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 // Use the client SDK 'db' as requested
-// --- FIX: Updated the import path ---
 import { db } from './lib/firebase.js'; 
 import { 
   collection, 
@@ -118,21 +117,22 @@ const generateTrxID = () => {
 
 
 // --- API Endpoints (Using Client SDK v9) ---
+// --- ALL ROUTES ARE NOW PREPENDED WITH /api/kanri ---
 
 // [GET] Welcome route
-app.get('/', (req, res) => {
+app.get('/api/kanri', (req, res) => {
   res.status(200).send({ 
     message: 'Welcome to the Kanri API!',
     note: 'This is the base of the /api/kanri function.',
     endpoints: {
-      getAllUsers: '/users',
-      getUserHistory: '/users/:username/history',
+      getAllUsers: '/api/kanri/users',
+      getUserHistory: '/api/kanri/users/:username/history',
     } 
   });
 });
 
 // [POST] Create a new account
-app.post('/users', requireAdminAuth, async (req, res) => {
+app.post('/api/kanri/users', requireAdminAuth, async (req, res) => {
   try {
     const { username, name, email, password, initialAmount } = req.body;
 
@@ -164,7 +164,7 @@ app.post('/users', requireAdminAuth, async (req, res) => {
 });
 
 // [GET] Get all user data
-app.get('/users', async (req, res) => {
+app.get('/api/kanri/users', async (req, res) => {
   try {
     const usersRef = collection(db, 'kanri_users');
     const snapshot = await getDocs(usersRef);
@@ -186,7 +186,7 @@ app.get('/users', async (req, res) => {
 });
 
 // [GET] Get history for a specific user
-app.get('/users/:username/history', requireUserOrAdminAuth, async (req, res) => {
+app.get('/api/kanri/users/:username/history', requireUserOrAdminAuth, async (req, res) => {
   try {
     const { username } = req.params;
     
@@ -210,7 +210,6 @@ app.get('/users/:username/history', requireUserOrAdminAuth, async (req, res) => 
     // Sort in code to avoid needing an index
     history.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
 
-    // --- FIX: Corrected typo '2S00' to '200' ---
     return res.status(200).send(history);
   } catch (error) {
     console.error("GET /users/:username/history error:", error);
@@ -219,7 +218,7 @@ app.get('/users/:username/history', requireUserOrAdminAuth, async (req, res) => 
 });
 
 // [PUT] Add or deduct amount for a user
-app.put('/users/:username/transaction', requireAdminAuth, async (req, res) => {
+app.put('/api/kanri/users/:username/transaction', requireAdminAuth, async (req, res) => {
   const { username } = req.params;
   const { type, amount, purpose } = req.body;
 
@@ -290,11 +289,11 @@ app.put('/users/:username/transaction', requireAdminAuth, async (req, res) => {
 });
 
 // [DELETE] Delete a user
-app.delete('/users/:username', requireAdminAuth, async (req, res) => {
+app.delete('/api/kanri/users/:username', requireAdminAuth, async (req, res) => {
   try {
     const { username } = req.params;
     const userRef = doc(db, 'kanri_users', username);
-    const docSnap = await getDoc(userRef);
+    const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
       return res.status(404).send({ error: 'User not found.' });
