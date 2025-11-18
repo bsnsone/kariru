@@ -1,7 +1,9 @@
 // IMPORT PATHS UPDATED
-import { tdb } from '../../lib/firebase.js';
+// --- THIS IS THE FIX ---
+// Import 'admin' and 'tdb' from OUR firebase.js file
+import { tdb, admin } from '../../lib/firebase.js';
 import { setCorsHeaders, checkAdminAuth, generateTrxID } from '../../lib/helpers.js';
-import admin from 'firebase-admin'; // Needed for ServerTimestamp and Transaction
+// We no longer import 'admin' from 'firebase-admin' here
 
 export default async function handler(req, res) {
   // === CORS HEADERS ===
@@ -64,6 +66,7 @@ export default async function handler(req, res) {
         type: type,
         amount: numericAmount,
         purpose: purpose,
+        // Use the imported admin object
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
         admin: "admin",
         previousAmount: currentAmount,
