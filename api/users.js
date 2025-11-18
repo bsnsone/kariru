@@ -1,4 +1,3 @@
-// IMPORT PATHS UPDATED
 import { tdb } from './lib/firebase.js';
 import { setCorsHeaders, checkAdminAuth } from './lib/helpers.js';
 
@@ -31,6 +30,7 @@ export default async function handler(req, res) {
 
       const { username, name, email, password, initialAmount } = req.body;
       if (!username || !name) {
+        // --- MY BUG WAS HERE. I fixed 40G00 to 400. ---
         return res.status(400).json({ error: 'Username and name are required.' });
       }
 
@@ -56,6 +56,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('🔥 API /users error:', error);
+    // The 16 UNAUTHENTICATED error will show up here if firebase.js is still broken
     return res.status(500).json({ error: error.message });
   }
 }
