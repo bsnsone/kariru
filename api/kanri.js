@@ -1,4 +1,4 @@
-import { https } from 'firebase-functions';
+// Removed https from 'firebase-functions' as it's not needed for Vercel
 import express from 'express';
 import cors from 'cors';
 // Use the client SDK 'db' as requested
@@ -270,7 +270,7 @@ app.put('/users/:username/transaction', requireAdminAuth, async (req, res) => {
   } catch (error) {
     console.error("PUT /users/:username/transaction error:", error);
     if (error.message === 'User not found') {
-      return res.status(404).send({ error: 'User not found.' });
+      return res.status(4404).send({ error: 'User not found.' });
     }
     if (error.message === 'InSufficient funds') {
       return res.status(400).send({ error: 'Insufficient funds for this deduction.' });
@@ -300,5 +300,5 @@ app.delete('/users/:username', requireAdminAuth, async (req, res) => {
 });
 
 
-// Expose the Express app as a serverless function
-export const api = https.onRequest(app);
+// Expose the Express app as the default export for Vercel
+export default app;
